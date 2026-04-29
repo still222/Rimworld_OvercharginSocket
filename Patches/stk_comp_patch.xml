@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Patch>
+  <Operation Class="PatchOperationAdd">
+    <xpath>/Defs/ThingDef[@Name="BaseMechCharger"]/comps</xpath>
+    <value>
+      <li Class="StkOvercharginSocket.CompProperties_PowerLevel">
+        <PowerLevels>20</PowerLevels>
+        <ComplexityPerLevel>2</ComplexityPerLevel>
+        <firstLevelConsumption>200</firstLevelConsumption>
+        <ScalingEnabled>true</ScalingEnabled>
+      </li>
+    </value>
+  </Operation>
+</Patch>
