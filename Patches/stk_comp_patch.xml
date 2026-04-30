@@ -4,9 +4,7 @@
     <xpath>/Defs/ThingDef[@Name="BaseMechCharger"]/comps</xpath>
     <value>
       <li Class="StkOvercharginSocket.CompProperties_PowerLevel">
-        <PowerLevels>20</PowerLevels>
-        <ComplexityPerLevel>2</ComplexityPerLevel>
-        <firstLevelConsumption>200</firstLevelConsumption>
+        <PowerLevels>5</PowerLevels> <!--It will be multiplied by the current tech (from 1 to 4)-->
         <ScalingEnabled>true</ScalingEnabled>
       </li>
     </value>
