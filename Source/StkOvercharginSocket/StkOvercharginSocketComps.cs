@@ -20,23 +20,26 @@ public class CompPowerLevel : ThingComp
 			.Distinct()];
 	private bool IsLightCompatible => MechClassesList.Any(LightMechClasses.Contains);
 	private bool IsHeavyCompatible => MechClassesList.Any(def => !LightMechClasses.Contains(def));
-	private static int TechLevel => MechTechUtility.GetLevel();	// From 1 to 4, depends on currently researched mech's technology
 	private const float DefaultChargePerTick = 0.00083333335f;	// From original charger class. It uses it as a plain number, could change with game version
+	private static int TechLevel => MechTechUtility.GetLevel();	// From 1 to 4, depends on currently researched mech's technology
+	public int MaxOvercharge => Props.powerLevels * TechLevel;	// This is sent to the gizmo tooltip
 	private int realPowerLevel = 1;			// Updates on the tick which actually updates power
 	public int PowerLevel = 1;				// Updates from the interface
 	public bool Overcharged = false;		// For overpowered charging with explosions
 	public bool ExpectsHeavyMech = false;	// Gizmo shows power consumption depending on this bool. For chargers that charge non-Light or was charging them last time
 	public virtual bool Overclockable => Props.overclockable;
+	public virtual bool Overchargable => Props.overchargable && TechLevel > 1;
 	public virtual float PowerScaling => Props.scalingEnabled ? (float)Math.Pow(1.025, PowerLevel - 1) : 1f;
 	public virtual float LightPowerUsage => realPowerLevel * Props.lightMechCost * PowerScaling;
 	public virtual float HeavyPowerUsage => realPowerLevel * Props.heavyMechCost * PowerScaling;
+	public virtual int MaxPowerLevel => Overcharged ? MaxOvercharge : Props.powerLevels;
 
 	public override void PostSpawnSetup(bool respawningAfterLoad)
 	{
 		base.PostSpawnSetup(respawningAfterLoad);
 		powerComp = parent.GetComp<CompPowerTrader>();
 
-		if (Props.overchargable && !Overclockable)
+		if (Overchargable && !Overclockable)
 			Log.Warning($"[StkChargingStations] {Charger.def.LabelCap} is overchargable but not overclockable, check its XML.");
 		
 		if (!IsLightCompatible)
@@ -56,7 +59,7 @@ public class CompPowerLevel : ThingComp
 			if (!Overclockable)
 				PowerLevel = 1;
 
-			if (!Props.overchargable)
+			if (!Overchargable)
 				Overcharged = false;
 		}
 
@@ -71,7 +74,7 @@ public class CompPowerLevel : ThingComp
 			if (!text.NullOrEmpty())
 				text += "\n";
 
-			text += $"Power level: {PowerLevel}/{Props.powerLevels * TechLevel}";
+			text += $"Power level: {PowerLevel}/{MaxPowerLevel}";
 		}
 
 		return text;
@@ -93,7 +96,12 @@ public class CompPowerLevel : ThingComp
 			else
 			{
 				if (Overclockable)
+				{
+					if (PowerLevel > MaxPowerLevel)
+						PowerLevel = MaxPowerLevel;
+
 					realPowerLevel = PowerLevel;
+				}
 
 				if (IsLightCompatible && IsHeavyCompatible)
 				{
@@ -132,20 +140,20 @@ public class CompPowerLevel : ThingComp
 				yield return new Command_SetPowerLevel
 				{
 					comp = this,
-					defaultLabel = "stkSetPowerLevel".Translate(),
-					defaultDesc = "stkSetPowerLevelDesc".Translate(),
+					defaultLabel = "stkSetPowerLevel".TranslateSimple(),
+					defaultDesc = "stkSetPowerLevelDesc".TranslateSimple(),
 					icon = ContentFinder<Texture2D>.Get("UI/Commands/SetTargetFuelLevel")
 				};
 
-				if (Props.overchargable)
+				if (Overchargable)
 				{
 					string str = Overcharged ? "On".Translate() : "Off".Translate();
 					yield return new Command_Toggle
 					{
 						isActive = () => Overcharged,
 						toggleAction = ToggleOvercharge,
-						defaultLabel = "CommandToggleAllowAutoRefuel".Translate(),
-						defaultDesc = "CommandToggleAllowAutoRefuelDescMult".Translate(str.UncapitalizeFirst().Named("ONOFF")),
+						defaultLabel = "stkCommandToggleOvercharge".TranslateSimple(),
+						defaultDesc = "stkCommandToggleOverchargeDescMult".Translate(str.UncapitalizeFirst().Named("ONOFF")),
 						icon = Overcharged ? TexCommand.ForbidOn : TexCommand.ForbidOff,
 						Order = 20f,
 						hotKey = KeyBindingDefOf.Command_ColonistDraft
@@ -165,7 +173,7 @@ public class CompPowerLevel : ThingComp
 		if (!Overclockable)
 			return;
 
-		int level = Mathf.Clamp(Mathf.RoundToInt(inputLevel), 1, Props.powerLevels * TechLevel);
+		int level = Mathf.Clamp(Mathf.RoundToInt(inputLevel), 1, MaxPowerLevel);
 
 		if (PowerLevel != level)
 			PowerLevel = level;
@@ -174,7 +182,7 @@ public class CompPowerLevel : ThingComp
 	[SyncMethod(SyncContext.None)]
 	public void ToggleOvercharge()
 	{
-		if (!Props.overchargable)
+		if (!Overchargable)
 			return;
 		
 		Overcharged = !Overcharged;

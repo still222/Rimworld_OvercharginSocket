@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using RimWorld;
@@ -13,35 +12,45 @@ namespace StkOvercharginSocket;
 public class Gizmo_PowerLevel(CompPowerLevel comp) : Gizmo_Slider
 {
 	private static bool draggingBar;
-	private static int TechLevel => MechTechUtility.GetLevel();
 	private static readonly Texture2D OverchargeIcon = ContentFinder<Texture2D>.Get("UI/Commands/SetTargetFuelLevel");
-	private int MaxPowerLevel => comp.Props.powerLevels * TechLevel;
+	private int MaxPowerLevel => comp.MaxPowerLevel;
 	private float FloatStepLevel => 1f / MaxPowerLevel;
 	private float LightMechPowerUsage => comp.PowerLevel * comp.Props.lightMechCost * comp.PowerScaling;
 	private float HeavyMechPowerUsage => comp.PowerLevel * comp.Props.heavyMechCost * comp.PowerScaling;
-	protected override float Target
-	{
-		get => (float)comp.PowerLevel / MaxPowerLevel;
-		set => comp.SetPowerLevel(value * MaxPowerLevel);
-	}
 
 	protected override float ValuePercent => (float)comp.PowerLevel / MaxPowerLevel;
-	protected override string Title => "stkPowerLevel".TranslateSimple();
+	protected override string Title => "stkChargingOverclockLevel".TranslateSimple();
 	protected override bool IsDraggable => comp.Overclockable;
 	protected override FloatRange DragRange { get => new(FloatStepLevel, 1f); }
 	protected override string BarLabel => $"{comp.PowerLevel} / {MaxPowerLevel} ({(comp.ExpectsHeavyMech ? HeavyMechPowerUsage : LightMechPowerUsage):F0} W)";
+	protected override Color BarColor 
+	{
+		get => comp.Overcharged 
+			? new Color(0.569f, 0.125f, 0f)
+			: base.BarColor;
+	}
+	protected override Color BarHighlightColor 
+	{
+		get => comp.Overcharged 
+			? new Color(0.749f, 0.165f, 0f)
+			: base.BarHighlightColor;
+	}
 
 	protected override bool DraggingBar
 	{
 		get => draggingBar;
 		set => draggingBar = value;
 	}
-
+	protected override float Target
+	{
+		get => (float)comp.PowerLevel / MaxPowerLevel;
+		set => comp.SetPowerLevel(value * MaxPowerLevel);
+	}
 
 	// Overcharge button
 	public override GizmoResult GizmoOnGUI(Vector2 topLeft, float maxWidth, GizmoRenderParms parms)
 	{
-		if (!comp.Props.overchargable)
+		if (!comp.Overchargable)
 			return base.GizmoOnGUI(topLeft, maxWidth, parms);
 
 		if (SteamDeck.IsSteamDeckInNonKeyboardMode)
@@ -64,7 +73,7 @@ public class Gizmo_PowerLevel(CompPowerLevel comp) : Gizmo_Slider
 
 	protected override void DrawHeader(Rect headerRect, ref bool mouseOverElement)
 	{
-		if (comp.Props.overchargable)
+		if (comp.Overchargable)
 		{
 			headerRect.xMax -= 24f;
 			Rect rect = new(headerRect.xMax, headerRect.y, 24f, 24f);
@@ -94,10 +103,10 @@ public class Gizmo_PowerLevel(CompPowerLevel comp) : Gizmo_Slider
 
 	private string OverchargeTip()	//TODO: Need a lot of new strings
 	{
-		string text = string.Format("{0}", "CommandToggleAllowAutoRefuel".Translate()) + "\n\n";
+		string text = string.Format("{0}", "stkCommandToggleOvercharge".Translate()) + "\n\n";
 		string str = comp.Overcharged ? "On".Translate() : "Off".Translate();
-		string text2 = comp.PowerLevel.ToString("F0").Colorize(ColoredText.TipSectionTitleColor);
-		string text3 = string.Concat(text + "CommandToggleAllowAutoRefuelDesc".Translate(text2, str.UncapitalizeFirst().Named("ONOFF")).Resolve(), "\n\n");
+		string text2 = comp.MaxOvercharge.ToString("F0").Colorize(ColoredText.TipSectionTitleColor);
+		string text3 = string.Concat(text + "stkCommandToggleOverchargeDesc".Translate(text2, str.UncapitalizeFirst().Named("ONOFF")).Resolve(), "\n\n");
 		string text4 = KeyPrefs.KeyPrefsData.GetBoundKeyCode(KeyBindingDefOf.Command_ColonistDraft, KeyPrefs.BindingSlot.A).ToStringReadable();
 		return text3 + ("HotKeyTip".Translate() + ": " + text4);
 	}
@@ -115,7 +124,6 @@ public class Command_SetPowerLevel : Command
 {
 	public CompPowerLevel comp;
 	private List<CompPowerLevel> comps;
-	private static int TechLevel => MechTechUtility.GetLevel();
 	public override void ProcessInput(Event ev)
 	{
 		base.ProcessInput(ev);
@@ -125,7 +133,7 @@ public class Command_SetPowerLevel : Command
 		if (!comps.Contains(comp))
 			comps.Add(comp);
 
-		int max = comps.Min(c => c.Props.powerLevels * TechLevel);
+		int max = comps.Min(c => c.MaxPowerLevel);
 
 		int start = comps[0].PowerLevel;
 
