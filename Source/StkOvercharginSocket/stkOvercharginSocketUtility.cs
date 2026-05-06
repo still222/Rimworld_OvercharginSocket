@@ -63,7 +63,7 @@ public static class MechTechUtility
 	public static void UpdateOverchargeFlickDesignation(Thing t)
 	{
 		bool wantsFlick = t is ThingWithComps twc &&
-			twc.AllComps.Any(c => c is CompFlickable f && f.WantsFlick());
+			twc.AllComps.Any(c => c is CompPowerLevel f && f.WantsFlick());
 
 		Designation designation = t.Map.designationManager.DesignationOn(t, StkDefOf.StkDesignationFlick);
 

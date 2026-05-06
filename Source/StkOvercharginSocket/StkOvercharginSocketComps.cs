@@ -24,10 +24,10 @@ public class CompPowerLevel : ThingComp
 	private const float DefaultChargePerTick = 0.00083333335f;	// From original charger class. It uses it as a plain number, could change with game version
 	private static int TechLevel => MechTechUtility.GetLevel();	// From 1 to 4, depends on currently researched mech's technology
 	private bool OverchargeOnInt = false;	// For handling flick-like logic for Overcharging
-	private bool wantsOvercharge = false;	// Controlled by gizmos, similar to flicking
 	private int realPowerLevel = 1;			// Updates on the tick which actually updates power
 	public int PowerLevel = 1;				// Updates from the interface
 	public bool ExpectsHeavyMech = false;	// Gizmo shows power consumption depending on this bool. For chargers that charge non-Light or was charging them last time
+	public bool wantsOvercharge = false;	// Controlled by gizmos, similar to flicking
 	public int MaxOvercharge => Props.powerLevels * TechLevel;	// This is sent to the gizmo tooltip
 	public const string FlickedOnSignal = "FlickedOn";
 	public const string FlickedOffSignal = "FlickedOff";
@@ -179,11 +179,11 @@ public class CompPowerLevel : ThingComp
 					string str = Overcharged ? "On".Translate() : "Off".Translate();
 					yield return new Command_Toggle
 					{
-						isActive = () => Overcharged,
+						isActive = () => wantsOvercharge,
 						toggleAction = ToggleOvercharge,
 						defaultLabel = "stkCommandToggleOvercharge".TranslateSimple(),
 						defaultDesc = "stkCommandToggleOverchargeDescMult".Translate(str.UncapitalizeFirst().Named("ONOFF")),
-						icon = Overcharged ? TexCommand.ForbidOn : TexCommand.ForbidOff,
+						icon = wantsOvercharge ? TexCommand.ForbidOn : TexCommand.ForbidOff,
 						Order = 20f,
 						hotKey = KeyBindingDefOf.Command_ColonistDraft
 					};
