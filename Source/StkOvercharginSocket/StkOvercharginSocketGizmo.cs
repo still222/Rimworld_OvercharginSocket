@@ -29,19 +29,30 @@ public class Gizmo_PowerLevel(CompPowerLevel comp) : Gizmo_Slider
 		);
 	}
 
-	protected override float ValuePercent =>
-		(float)comp.PowerLevel / MaxPowerLevel;
+	protected override float ValuePercent => (float)comp.PowerLevel / MaxPowerLevel;
 
+	protected override string Title => "Power Level";
+
+	protected override bool IsDraggable => true;
+
+	protected override string BarLabel =>
+		$"{comp.PowerLevel} / {MaxPowerLevel} ({(comp.ExpectsHeavyMech ? comp.HeavyPowerUsage : comp.LightPowerUsage):F0} W)";
+
+	protected override bool DraggingBar
+	{
+		get => draggingBar;
+		set => draggingBar = value;
+	}
+
+	// Overcharge button
 	public override GizmoResult GizmoOnGUI(Vector2 topLeft, float maxWidth, GizmoRenderParms parms)
 	{
 		if (!comp.Props.overchargable)
-		{
 			return base.GizmoOnGUI(topLeft, maxWidth, parms);
-		}
+
 		if (SteamDeck.IsSteamDeckInNonKeyboardMode)
-		{
 			return base.GizmoOnGUI(topLeft, maxWidth, parms);
-		}
+
 		KeyCode keyCode = (KeyBindingDefOf.Command_ColonistDraft != null) ? KeyBindingDefOf.Command_ColonistDraft.MainKey : KeyCode.None;
 		if (keyCode != KeyCode.None && !GizmoGridDrawer.drawnHotKeys.Contains(keyCode) && KeyBindingDefOf.Command_ColonistDraft.KeyDownEvent)
 		{
@@ -53,6 +64,7 @@ public class Gizmo_PowerLevel(CompPowerLevel comp) : Gizmo_Slider
 			comp.ToggleOvercharge();
 			Event.current.Use();
 		}
+
 		return base.GizmoOnGUI(topLeft, maxWidth, parms);
 	}
 
@@ -73,27 +85,17 @@ public class Gizmo_PowerLevel(CompPowerLevel comp) : Gizmo_Slider
 
 				comp.ToggleOvercharge();
 			}
+
 			if (Mouse.IsOver(rect))
 			{
 				Widgets.DrawHighlight(rect);
 				TooltipHandler.TipRegion(rect, OverchargeTip, 828267373);
 				mouseOverElement = true;
 			}
+
 		}
+
 		base.DrawHeader(headerRect, ref mouseOverElement);
-	}
-
-	protected override string Title => "Power Level";
-
-	protected override bool IsDraggable => true;
-
-	protected override string BarLabel =>
-		$"{comp.PowerLevel} / {MaxPowerLevel} ({(comp.ExpectsHeavyMech ? comp.HeavyPowerUsage : comp.LightPowerUsage):F0} W)";
-
-	protected override bool DraggingBar
-	{
-		get => draggingBar;
-		set => draggingBar = value;
 	}
 
 	private string OverchargeTip()
@@ -110,6 +112,7 @@ public class Gizmo_PowerLevel(CompPowerLevel comp) : Gizmo_Slider
 	{
 		return "";
 	}
+	
 }
 
 [StaticConstructorOnStartup]
@@ -152,4 +155,5 @@ public class Command_SetPowerLevel : Command
 		comps.Add(((Command_SetPowerLevel)other).comp);
 		return false;
 	}
+
 }
