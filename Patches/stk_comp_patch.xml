@@ -1,12 +1,46 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Patch>
-  <Operation Class="PatchOperationAdd">
-    <xpath>/Defs/ThingDef[@Name="BaseMechCharger"]/comps</xpath>
-    <value>
-      <li Class="StkOvercharginSocket.CompProperties_PowerLevel">
-        <PowerLevels>5</PowerLevels> <!--It will be multiplied by the current tech (from 1 to 4)-->
-        <ScalingEnabled>true</ScalingEnabled>
-      </li>
-    </value>
-  </Operation>
+	<Operation Class="PatchOperationAdd">
+		<xpath>/Defs/ThingDef[@Name="BaseMechCharger"]/comps</xpath>
+		<value>
+			<li Class="StkOvercharginSocket.CompProperties_PowerLevel">
+				<powerLevels>5</powerLevels> <!--It will be multiplied by the current mech research (from 1 to 4 -> basic to ultra)-->
+				<scalingEnabled>true</scalingEnabled>
+				<overchargable>false</overchargable>
+				<!--These are default values for basic and heavy chargers - not needed, but you can modify them here. (!)Power from CompPowerTrader does nothing(!)-->
+				<lightMechCost>200</lightMechCost>
+				<heavyMechCost>400</heavyMechCost>
+				<!--<countsAsLightWeightClasses>
+					<li>Light</li>
+				</countsAsLightWeightClasses>-->
+			</li>
+		</value>
+	</Operation>
+
+	<Operation Class="PatchOperationConditional">
+		<xpath>/Defs/ThingDef[defName="BasicRecharger"]/minifiedDef</xpath>
+		<nomatch Class="PatchOperationAdd">
+			<xpath>/Defs/ThingDef[defName="BasicRecharger"]</xpath>
+			<value>
+				<minifiedDef>MinifiedThing</minifiedDef>
+				<thingCategories>
+					<li>BuildingsFurniture</li>
+				</thingCategories>
+			</value>
+		</nomatch>
+	</Operation>
+
+	<!--Example of a patch to change a specific charger-->
+	<Operation Class="PostInheritanceOperation.Patch">
+		<operation Class="PatchOperationReplace">
+			<xpath>/Defs/ThingDef[defName="stk_BasicSocketCharger"]/comps/li[@Class="StkOvercharginSocket.CompProperties_PowerLevel"]</xpath>
+			<value>
+				<li Class="StkOvercharginSocket.CompProperties_PowerLevel">
+					<overclockable>false</overclockable>
+					<overchargable>false</overchargable>
+				</li>
+			</value>
+		</operation>
+	</Operation>
+
 </Patch>

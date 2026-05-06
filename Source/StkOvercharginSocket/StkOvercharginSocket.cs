@@ -1,3 +1,4 @@
+using HarmonyLib;
 using Multiplayer.API;
 using Verse;
 
@@ -8,10 +9,12 @@ public static class Startup
 {
 	static Startup()
 	{
-		//var harmony = new Harmony("stk.overcharged.socket");
-		//harmony.PatchAll();
+		var harmony = new Harmony("stk.overcharged.socket");
+		harmony.PatchAll();
 
 		if (MP.enabled)
 			MP.RegisterSyncMethod(typeof(CompPowerLevel), nameof(CompPowerLevel.SetPowerLevel));
+
 	}
+
 }

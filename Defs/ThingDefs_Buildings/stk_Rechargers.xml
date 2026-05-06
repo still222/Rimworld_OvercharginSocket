@@ -13,6 +13,10 @@
 				<volume>(1.9, 0.5, 0.9)</volume>
 			</shadowData>
 		</graphicData>
+		<minifiedDef>MinifiedThing</minifiedDef>
+		<thingCategories>
+			<li>BuildingsFurniture</li>
+		</thingCategories>
 		<passability>Standable</passability>
 		<statBases>
 			<MaxHitPoints>150</MaxHitPoints>
@@ -23,8 +27,8 @@
 		<size>(2,1)</size>
 		<altitudeLayer>BuildingOnTop</altitudeLayer>
 		<building>
-      <isEdifice>false</isEdifice>
-      <isAttachment>true</isAttachment>
+	  <isEdifice>false</isEdifice>
+	  <isAttachment>true</isAttachment>
 			<requiredMechWeightClasses>
 				<li>Light</li>
 			</requiredMechWeightClasses>
@@ -54,9 +58,9 @@
 		<researchPrerequisites>
 			<li>BasicMechtech</li>
 		</researchPrerequisites>
-    <placeWorkers>
-      <li>Placeworker_AttachedToWall</li>
-    </placeWorkers>
+	<placeWorkers>
+	  <li>Placeworker_AttachedToWall</li>
+	</placeWorkers>
 		<comps>
 			<li Class="CompProperties_ThingContainer">
 				<compClass>CompThingContainer</compClass>
