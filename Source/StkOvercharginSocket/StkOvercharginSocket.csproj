@@ -27,6 +27,6 @@
 
   <ItemGroup>
     <Publicize Include="Assembly-CSharp;0Harmony;UnityEngine.IMGUIModule"/>
-    <DoNotPublicize Include="0Harmony:System.Runtime.CompilerServices.DefaultInterpolatedStringHandler;Assembly-CSharp:Verse.Gizmo_Slider" />
+    <DoNotPublicize Include="0Harmony:System.Runtime.CompilerServices.DefaultInterpolatedStringHandler;Assembly-CSharp:Verse.Gizmo_Slider;Assembly-CSharp:RimWorld.JobDriver_Flick;Assembly-CSharp:RimWorld.WorkGiver_Flick" />
   </ItemGroup>
 </Project>

@@ -22,7 +22,7 @@ public static class Patch_Pawn_GetInspectString
 		var toStringPercent = AccessTools.Method(
 			typeof(GenText),
 			nameof(GenText.ToStringPercent),
-			new[] { typeof(float) }
+			[typeof(float)]
 		);
 
 		bool replaced = false;

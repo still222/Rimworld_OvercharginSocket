@@ -5,21 +5,23 @@ using Verse;
 namespace StkOvercharginSocket;
 
 [DefOf]
-public static class ResearchDefOf
+public static class StkDefOf
 {
 	//public static ResearchProjectDef BasicMechtech;
 	public static ResearchProjectDef StandardMechtech;
 	public static ResearchProjectDef HighMechtech;
 	public static ResearchProjectDef UltraMechtech;
+	public static DesignationDef StkDesignationFlick;
+	public static JobDef StkOverchargeFlick;
 }
 
 public static class MechTechUtility
 {
 	public static int GetLevel()
 	{
-		if (ResearchDefOf.UltraMechtech.IsFinished) return 4;
-		if (ResearchDefOf.HighMechtech.IsFinished) return 3;
-		if (ResearchDefOf.StandardMechtech.IsFinished) return 2;
+		if (StkDefOf.UltraMechtech.IsFinished) return 4;
+		if (StkDefOf.HighMechtech.IsFinished) return 3;
+		if (StkDefOf.StandardMechtech.IsFinished) return 2;
 		else return 1;
 	}
 
@@ -55,6 +57,21 @@ public static class MechTechUtility
 			c.wasteProduced = 0f;
 			c.GenerateWastePack();
 		}
+
+	}
+
+	public static void UpdateOverchargeFlickDesignation(Thing t)
+	{
+		bool wantsFlick = t is ThingWithComps twc &&
+			twc.AllComps.Any(c => c is CompFlickable f && f.WantsFlick());
+
+		Designation designation = t.Map.designationManager.DesignationOn(t, StkDefOf.StkDesignationFlick);
+
+		if (wantsFlick && designation == null)
+			t.Map.designationManager.AddDesignation(new Designation(t, StkDefOf.StkDesignationFlick));
+
+		else if (!wantsFlick)
+			designation?.Delete();
 
 	}
 

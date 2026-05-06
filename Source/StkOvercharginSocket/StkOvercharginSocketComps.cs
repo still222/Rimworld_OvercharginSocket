@@ -5,6 +5,7 @@ using Multiplayer.API;
 using RimWorld;
 using UnityEngine;
 using Verse;
+using Verse.Sound;
 
 namespace StkOvercharginSocket;
 
@@ -22,17 +23,40 @@ public class CompPowerLevel : ThingComp
 	private bool IsHeavyCompatible => MechClassesList.Any(def => !LightMechClasses.Contains(def));
 	private const float DefaultChargePerTick = 0.00083333335f;	// From original charger class. It uses it as a plain number, could change with game version
 	private static int TechLevel => MechTechUtility.GetLevel();	// From 1 to 4, depends on currently researched mech's technology
-	public int MaxOvercharge => Props.powerLevels * TechLevel;	// This is sent to the gizmo tooltip
+	private bool OverchargeOnInt = false;	// For handling flick-like logic for Overcharging
+	private bool wantsOvercharge = false;	// Controlled by gizmos, similar to flicking
 	private int realPowerLevel = 1;			// Updates on the tick which actually updates power
 	public int PowerLevel = 1;				// Updates from the interface
-	public bool Overcharged = false;		// For overpowered charging with explosions
 	public bool ExpectsHeavyMech = false;	// Gizmo shows power consumption depending on this bool. For chargers that charge non-Light or was charging them last time
-	public virtual bool Overclockable => Props.overclockable;
-	public virtual bool Overchargable => Props.overchargable && TechLevel > 1;
+	public int MaxOvercharge => Props.powerLevels * TechLevel;	// This is sent to the gizmo tooltip
+	public const string FlickedOnSignal = "FlickedOn";
+	public const string FlickedOffSignal = "FlickedOff";
+	public virtual int MaxPowerLevel => Overcharged ? MaxOvercharge : Props.powerLevels;
 	public virtual float PowerScaling => Props.scalingEnabled ? (float)Math.Pow(1.025, PowerLevel - 1) : 1f;
 	public virtual float LightPowerUsage => realPowerLevel * Props.lightMechCost * PowerScaling;
 	public virtual float HeavyPowerUsage => realPowerLevel * Props.heavyMechCost * PowerScaling;
-	public virtual int MaxPowerLevel => Overcharged ? MaxOvercharge : Props.powerLevels;
+	public virtual bool Overchargable => Props.overchargable && TechLevel > 1;
+	public virtual bool Overclockable => Props.overclockable;
+	public virtual bool Overcharged
+	{
+		get => OverchargeOnInt;
+		set
+		{
+			if (OverchargeOnInt != value)
+			{
+				OverchargeOnInt = value;
+
+				if (OverchargeOnInt)
+					parent.BroadcastCompSignal(FlickedOnSignal);
+
+				else
+					parent.BroadcastCompSignal(FlickedOffSignal);
+
+			}
+
+		}
+
+	}
 
 	public override void PostSpawnSetup(bool respawningAfterLoad)
 	{
@@ -51,7 +75,8 @@ public class CompPowerLevel : ThingComp
 		base.PostExposeData();
 
 		Scribe_Values.Look(ref PowerLevel, "PowerLevel", 1);
-		Scribe_Values.Look(ref Overcharged, "Overcharged", false);
+		Scribe_Values.Look(ref OverchargeOnInt, "OverchargeOnInt", false);
+		Scribe_Values.Look(ref wantsOvercharge, "wantsOvercharge", false);
 		Scribe_Values.Look(ref ExpectsHeavyMech, "ExpectsHeavyMech", false);
 
 		if (Scribe.mode == LoadSaveMode.PostLoadInit)
@@ -60,7 +85,11 @@ public class CompPowerLevel : ThingComp
 				PowerLevel = 1;
 
 			if (!Overchargable)
-				Overcharged = false;
+			{
+				OverchargeOnInt = false;
+				wantsOvercharge = false;
+			}
+
 		}
 
 	}
@@ -179,13 +208,26 @@ public class CompPowerLevel : ThingComp
 			PowerLevel = level;
 	}
 
+	// Flickable Overcharge
 	[SyncMethod(SyncContext.None)]
 	public void ToggleOvercharge()
 	{
 		if (!Overchargable)
 			return;
 		
+		wantsOvercharge = !wantsOvercharge;
+		MechTechUtility.UpdateOverchargeFlickDesignation(parent);
+	}
+
+	public void DoFlick()
+	{
 		Overcharged = !Overcharged;
+		SoundDefOf.FlickSwitch.PlayOneShot(new TargetInfo(parent.Position, parent.Map));
+	}
+
+	public bool WantsFlick()
+	{
+		return wantsOvercharge != Overcharged;
 	}
 
 }
