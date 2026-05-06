@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using RimWorld;
@@ -91,7 +92,7 @@ public class Gizmo_PowerLevel(CompPowerLevel comp) : Gizmo_Slider
 		base.DrawHeader(headerRect, ref mouseOverElement);
 	}
 
-	private string OverchargeTip()
+	private string OverchargeTip()	//TODO: Need a lot of new strings
 	{
 		string text = string.Format("{0}", "CommandToggleAllowAutoRefuel".Translate()) + "\n\n";
 		string str = comp.Overcharged ? "On".Translate() : "Off".Translate();
@@ -128,17 +129,17 @@ public class Command_SetPowerLevel : Command
 
 		int start = comps[0].PowerLevel;
 
-		Find.WindowStack.Add(new Dialog_Slider(
-			"Set Power Level".Translate(),
-			1,
-			max,
-			value =>
-			{
-				foreach (var c in comps)
-					c.SetPowerLevel(value);
-			},
-			start
-		));
+		static string PowerLevelTextGetter(int x)
+		{
+			return "stkSetPowerLevelGizmo".Translate(x);
+		}
+
+		Find.WindowStack.Add(new Dialog_Slider(PowerLevelTextGetter, 1, max, delegate(int value)
+		{
+			foreach (var c in comps)
+				c.SetPowerLevel(value);
+		}, start));
+
 	}
 
 	public override bool InheritInteractionsFrom(Gizmo other)
