@@ -20,7 +20,6 @@ public class CompPowerLevel : ThingComp
 			.Distinct()];
 	private bool IsLightCompatible => MechClassesList.Any(LightMechClasses.Contains);
 	private bool IsHeavyCompatible => MechClassesList.Any(def => !LightMechClasses.Contains(def));
-	private float PowerScaling => Props.scalingEnabled ? (float)Math.Pow(1.025, PowerLevel - 1) : 1f;
 	private static int TechLevel => MechTechUtility.GetLevel();	// From 1 to 4, depends on currently researched mech's technology
 	private const float DefaultChargePerTick = 0.00083333335f;	// From original charger class. It uses it as a plain number, could change with game version
 	private int realPowerLevel = 1;			// Updates on the tick which actually updates power
@@ -28,6 +27,7 @@ public class CompPowerLevel : ThingComp
 	public bool Overcharged = false;		// For overpowered charging with explosions
 	public bool ExpectsHeavyMech = false;	// Gizmo shows power consumption depending on this bool. For chargers that charge non-Light or was charging them last time
 	public virtual bool Overclockable => Props.overclockable;
+	public virtual float PowerScaling => Props.scalingEnabled ? (float)Math.Pow(1.025, PowerLevel - 1) : 1f;
 	public virtual float LightPowerUsage => realPowerLevel * Props.lightMechCost * PowerScaling;
 	public virtual float HeavyPowerUsage => realPowerLevel * Props.heavyMechCost * PowerScaling;
 
@@ -160,12 +160,12 @@ public class CompPowerLevel : ThingComp
 	}
 
 	[SyncMethod(SyncContext.None)]
-	public void SetPowerLevel(int level)
+	public void SetPowerLevel(float inputLevel)
 	{
 		if (!Overclockable)
 			return;
 
-		level = Mathf.Clamp(level, 1, Props.powerLevels * TechLevel);
+		int level = Mathf.Clamp(Mathf.RoundToInt(inputLevel), 1, Props.powerLevels * TechLevel);
 
 		if (PowerLevel != level)
 			PowerLevel = level;
@@ -185,9 +185,9 @@ public class CompPowerLevel : ThingComp
 public class CompProperties_PowerLevel : CompProperties
 {
 	public int powerLevels = 5;
-	public bool scalingEnabled = false;
+	public bool scalingEnabled = true;
 	public bool overclockable = true;
-	public bool overchargable = true;
+	public bool overchargable = false;
 
 	// Default power cost for light and heavy chargers
 	public float lightMechCost = 200f;

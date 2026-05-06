@@ -11,38 +11,31 @@ namespace StkOvercharginSocket;
 [StaticConstructorOnStartup]
 public class Gizmo_PowerLevel(CompPowerLevel comp) : Gizmo_Slider
 {
-	private readonly CompPowerLevel comp = comp;
 	private static bool draggingBar;
-	private static readonly Texture2D OverchargeIcon = ContentFinder<Texture2D>.Get("UI/Commands/SetTargetFuelLevel");
 	private static int TechLevel => MechTechUtility.GetLevel();
+	private static readonly Texture2D OverchargeIcon = ContentFinder<Texture2D>.Get("UI/Commands/SetTargetFuelLevel");
 	private int MaxPowerLevel => comp.Props.powerLevels * TechLevel;
-
+	private float FloatStepLevel => 1f / MaxPowerLevel;
+	private float LightMechPowerUsage => comp.PowerLevel * comp.Props.lightMechCost * comp.PowerScaling;
+	private float HeavyMechPowerUsage => comp.PowerLevel * comp.Props.heavyMechCost * comp.PowerScaling;
 	protected override float Target
 	{
 		get => (float)comp.PowerLevel / MaxPowerLevel;
-		set => comp.SetPowerLevel(
-			Mathf.Clamp(
-				Mathf.RoundToInt(value * MaxPowerLevel),
-				1,
-				MaxPowerLevel
-			)
-		);
+		set => comp.SetPowerLevel(value * MaxPowerLevel);
 	}
 
 	protected override float ValuePercent => (float)comp.PowerLevel / MaxPowerLevel;
-
-	protected override string Title => "Power Level";
-
-	protected override bool IsDraggable => true;
-
-	protected override string BarLabel =>
-		$"{comp.PowerLevel} / {MaxPowerLevel} ({(comp.ExpectsHeavyMech ? comp.HeavyPowerUsage : comp.LightPowerUsage):F0} W)";
+	protected override string Title => "stkPowerLevel".TranslateSimple();
+	protected override bool IsDraggable => comp.Overclockable;
+	protected override FloatRange DragRange { get => new(FloatStepLevel, 1f); }
+	protected override string BarLabel => $"{comp.PowerLevel} / {MaxPowerLevel} ({(comp.ExpectsHeavyMech ? HeavyMechPowerUsage : LightMechPowerUsage):F0} W)";
 
 	protected override bool DraggingBar
 	{
 		get => draggingBar;
 		set => draggingBar = value;
 	}
+
 
 	// Overcharge button
 	public override GizmoResult GizmoOnGUI(Vector2 topLeft, float maxWidth, GizmoRenderParms parms)
