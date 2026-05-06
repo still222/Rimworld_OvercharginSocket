@@ -101,7 +101,7 @@ public class Gizmo_PowerLevel(CompPowerLevel comp) : Gizmo_Slider
 		base.DrawHeader(headerRect, ref mouseOverElement);
 	}
 
-	private string OverchargeTip()	//TODO: Need a lot of new strings
+	private string OverchargeTip()
 	{
 		string text = string.Format("{0}", "stkCommandToggleOvercharge".Translate()) + "\n\n";
 		string str = comp.Overcharged ? "On".Translate() : "Off".Translate();
