@@ -10,7 +10,7 @@ public class JobDriver_OverchargeFlick : JobDriver_Flick
 	protected override IEnumerable<Toil> MakeNewToils()
 	{
 		this.FailOnDespawnedOrNull(TargetIndex.A);
-		this.FailOn(() => base.Map.designationManager.DesignationOn(base.TargetThingA, StkDefOf.StkDesignationFlick) == null);
+		this.FailOn(() => Map.designationManager.DesignationOn(TargetThingA, StkDefOf.StkDesignationFlick) == null);
 		yield return Toils_Goto.GotoThing(TargetIndex.A, PathEndMode.Touch);
 		yield return Toils_General.Wait(15).FailOnCannotTouch(TargetIndex.A, PathEndMode.Touch);
 		Toil finalize = ToilMaker.MakeToil("MakeNewToils");
@@ -20,13 +20,13 @@ public class JobDriver_OverchargeFlick : JobDriver_Flick
 			ThingWithComps thingWithComps = (ThingWithComps)actor.CurJob.targetA.Thing;
 			foreach (var comp in thingWithComps.AllComps)
 			{
-				if (comp is CompPowerLevel powerComp && powerComp.WantsFlick())
-					powerComp.DoFlick();
+				if (comp is CompPowerLevel powerLevelComp && powerLevelComp.WantsFlick())
+					powerLevelComp.DoFlick();
 
 			}
 
 			actor.records.Increment(RecordDefOf.SwitchesFlicked);
-			base.Map.designationManager.DesignationOn(thingWithComps, StkDefOf.StkDesignationFlick)?.Delete();
+			Map.designationManager.DesignationOn(thingWithComps, StkDefOf.StkDesignationFlick)?.Delete();
 		};
 
 		finalize.defaultCompleteMode = ToilCompleteMode.Instant;

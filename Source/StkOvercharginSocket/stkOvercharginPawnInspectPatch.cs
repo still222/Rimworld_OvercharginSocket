@@ -65,4 +65,3 @@ public static class Patch_Pawn_GetInspectString
 	}
 
 }
-

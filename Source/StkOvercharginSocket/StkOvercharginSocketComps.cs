@@ -142,6 +142,7 @@ public class CompPowerLevel : ThingComp
 		mech.needs.energy.CurLevel += chargeMod * DefaultChargePerTick;
 		MechTechUtility.ProduceWaste(Charger, chargeMod);
 		
+		// Red mote, quite heavy for perfomance
 		if (Overcharged && (moteOvercharging == null || moteOvercharging.Destroyed))
 			moteOvercharging = MoteMaker.MakeAttachedOverlay(mech, StkDefOf.StkMote_Overcharging, Vector3.zero);
 
@@ -176,7 +177,7 @@ public class CompPowerLevel : ThingComp
 					defaultLabel = "stkCommandToggleOvercharge".TranslateSimple(),
 					defaultDesc = "stkCommandToggleOverchargeDescMult".Translate(str.UncapitalizeFirst().Named("ONOFF")),
 					icon = ContentFinder<Texture2D>.Get("UI/Commands/StkOverchargeCommand"),
-					Order = 20f,
+					Order = -1f,
 					hotKey = KeyBindingDefOf.Command_ColonistDraft
 				};
 
