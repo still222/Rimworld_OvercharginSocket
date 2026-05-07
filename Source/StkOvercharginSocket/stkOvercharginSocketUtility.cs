@@ -12,6 +12,7 @@ public static class StkDefOf
 	public static ResearchProjectDef HighMechtech;
 	public static ResearchProjectDef UltraMechtech;
 	public static DesignationDef StkDesignationFlick;
+	public static ThingDef StkMote_Overcharging;
 	public static JobDef StkOverchargeFlick;
 }
 

@@ -23,16 +23,15 @@ public class CompPowerLevel : ThingComp
 	private bool IsHeavyCompatible => MechClassesList.Any(def => !LightMechClasses.Contains(def));
 	private const float DefaultChargePerTick = 0.00083333335f;	// From original charger class. It uses it as a plain number, could change with game version
 	private static int TechLevel => MechTechUtility.GetLevel();	// From 1 to 4, depends on currently researched mech's technology
+	private Mote moteOvercharging;			// For the red glow of overcharging mechs
 	private bool OverchargeOnInt = false;	// For handling flick-like logic for Overcharging
 	private int realPowerLevel = 1;			// Updates on the tick which actually updates power
 	public int PowerLevel = 1;				// Updates from the interface
 	public bool ExpectsHeavyMech = false;	// Gizmo shows power consumption depending on this bool. For chargers that charge non-Light or was charging them last time
 	public bool wantsOvercharge = false;	// Controlled by gizmos, similar to flicking
 	public int MaxOvercharge => Props.powerLevels * TechLevel;	// This is sent to the gizmo tooltip
-	public const string FlickedOnSignal = "FlickedOn";
-	public const string FlickedOffSignal = "FlickedOff";
 	public virtual int MaxPowerLevel => Overcharged ? MaxOvercharge : Props.powerLevels;
-	public virtual float PowerScaling => Props.scalingEnabled ? (float)Math.Pow(1.025, PowerLevel - 1) : 1f;
+	public virtual float PowerScaling => Props.scalingMod > 1f ? (float)Math.Pow(Props.scalingMod, PowerLevel - 1) : 1f;
 	public virtual float LightPowerUsage => realPowerLevel * Props.lightMechCost * PowerScaling;
 	public virtual float HeavyPowerUsage => realPowerLevel * Props.heavyMechCost * PowerScaling;
 	public virtual bool Overchargable => Props.overchargable && TechLevel > 1;
@@ -43,17 +42,7 @@ public class CompPowerLevel : ThingComp
 		set
 		{
 			if (OverchargeOnInt != value)
-			{
 				OverchargeOnInt = value;
-
-				if (OverchargeOnInt)
-					parent.BroadcastCompSignal(FlickedOnSignal);
-
-				else
-					parent.BroadcastCompSignal(FlickedOffSignal);
-
-			}
-
 		}
 
 	}
@@ -152,6 +141,11 @@ public class CompPowerLevel : ThingComp
 		int chargeMod = realPowerLevel - 1;
 		mech.needs.energy.CurLevel += chargeMod * DefaultChargePerTick;
 		MechTechUtility.ProduceWaste(Charger, chargeMod);
+		
+		if (Overcharged && (moteOvercharging == null || moteOvercharging.Destroyed))
+			moteOvercharging = MoteMaker.MakeAttachedOverlay(mech, StkDefOf.StkMote_Overcharging, Vector3.zero);
+
+		moteOvercharging?.Maintain();
 	}
 
 	public override IEnumerable<Gizmo> CompGetGizmosExtra()
@@ -161,34 +155,30 @@ public class CompPowerLevel : ThingComp
 
 		if (powerComp != null && Overclockable)
 		{
-			if (Find.Selector.SelectedObjects.Count == 1)
-				yield return new Gizmo_PowerLevel(this);
-
-			else
-			{
+			if (Find.Selector.SelectedObjects.Count > 1)
 				yield return new Command_SetPowerLevel
 				{
 					comp = this,
 					defaultLabel = "stkSetPowerLevel".TranslateSimple(),
 					defaultDesc = "stkSetPowerLevelDesc".TranslateSimple(),
-					icon = ContentFinder<Texture2D>.Get("UI/Commands/SetTargetFuelLevel")
+					icon = ContentFinder<Texture2D>.Get("UI/Commands/StkSetTargetOverclock")
 				};
 
-				if (Overchargable)
-				{
-					string str = Overcharged ? "On".Translate() : "Off".Translate();
-					yield return new Command_Toggle
-					{
-						isActive = () => wantsOvercharge,
-						toggleAction = ToggleOvercharge,
-						defaultLabel = "stkCommandToggleOvercharge".TranslateSimple(),
-						defaultDesc = "stkCommandToggleOverchargeDescMult".Translate(str.UncapitalizeFirst().Named("ONOFF")),
-						icon = wantsOvercharge ? TexCommand.ForbidOn : TexCommand.ForbidOff,
-						Order = 20f,
-						hotKey = KeyBindingDefOf.Command_ColonistDraft
-					};
+			else yield return new Gizmo_PowerLevel(this);
 
-				}
+			if (Overchargable)
+			{
+				string str = Overcharged ? "Disable".Translate() : "Enable".Translate();
+				yield return new Command_Toggle
+				{
+					isActive = () => wantsOvercharge,
+					toggleAction = ToggleOvercharge,
+					defaultLabel = "stkCommandToggleOvercharge".TranslateSimple(),
+					defaultDesc = "stkCommandToggleOverchargeDescMult".Translate(str.UncapitalizeFirst().Named("ONOFF")),
+					icon = ContentFinder<Texture2D>.Get("UI/Commands/StkOverchargeCommand"),
+					Order = 20f,
+					hotKey = KeyBindingDefOf.Command_ColonistDraft
+				};
 
 			}
 
@@ -235,9 +225,9 @@ public class CompPowerLevel : ThingComp
 public class CompProperties_PowerLevel : CompProperties
 {
 	public int powerLevels = 5;
-	public bool scalingEnabled = true;
 	public bool overclockable = true;
 	public bool overchargable = false;
+	public float scalingMod = 1.02157f;	// To better tune the power scaling through XML. 1.02157 should add additional x1.5 scaling on level 20.
 
 	// Default power cost for light and heavy chargers
 	public float lightMechCost = 200f;
