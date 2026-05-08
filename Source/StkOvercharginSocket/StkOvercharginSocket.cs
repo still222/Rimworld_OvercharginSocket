@@ -13,9 +13,7 @@ public static class Startup
 		harmony.PatchAll();
 
 		if (MP.enabled)
-		{
 			MP.RegisterAll();
-		}
 
 	}
 

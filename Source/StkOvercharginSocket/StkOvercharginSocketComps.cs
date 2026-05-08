@@ -25,6 +25,8 @@ public class CompPowerLevel : ThingComp
 	private bool IsHeavyCompatible => MechClassesList.Any(def => !LightMechClasses.Contains(def));
 	private static int TechLevel => MechTechUtility.GetLevel();	// From 1 to 4, depends on currently researched mech's technology
 	private const float defaultChargePerTick = 0.00083333335f;	// From original charger class. It uses it as a plain number, could change with game version
+
+	[SyncField]
 	public int powerLevel = 1;				// Updates from the interface
 	private float mechEnergyBonus;			// To simlify tick calculations we cache the value every 250 ticks
 	private int realPowerLevel = 1;			// Updates on the tick which actually updates power
@@ -191,7 +193,6 @@ public class CompPowerLevel : ThingComp
 
 	}
 
-	[SyncMethod]
 	public void SetPowerLevel(float inputLevel)
 	{
 		if (!Overclockable)
@@ -199,8 +200,12 @@ public class CompPowerLevel : ThingComp
 
 		int level = Mathf.Clamp(Mathf.RoundToInt(inputLevel), 1, MaxPowerLevel);
 
+		MP.WatchBegin();
+		MP.Watch(this, nameof(powerLevel));
 		if (powerLevel != level)
 			powerLevel = level;
+
+		MP.WatchEnd();
 
 	}
 

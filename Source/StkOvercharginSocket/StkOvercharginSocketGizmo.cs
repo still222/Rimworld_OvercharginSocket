@@ -48,7 +48,7 @@ public class Gizmo_PowerLevel(CompPowerLevel comp) : Gizmo_Slider
 		get => FloatPowerLevelPercent;
 		set
 		{
-			if (MP.enabled && FloatPowerLevelPercent == value)
+			if (FloatPowerLevelPercent == value)
 				return;
 
 			comp.SetPowerLevel(value * MaxPowerLevel);
