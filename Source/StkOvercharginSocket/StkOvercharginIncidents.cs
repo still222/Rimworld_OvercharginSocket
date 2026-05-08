@@ -50,6 +50,23 @@ public static class Patch_GetShortCircuitablePowerConduits
 public class Alert_HaveOverchargers : Alert
 {
 	private readonly List<Thing> targets = [];
+	private bool? incidentDisabled;
+	private bool IncidentDisabledByScenario()
+	{
+		if (incidentDisabled.HasValue)
+			return incidentDisabled.Value;
+
+		foreach (var part in Find.Scenario.parts)
+			if (part is ScenPart_DisableIncident disable &&	disable.Incident == StkDefOf.ShortCircuit)
+			{
+				incidentDisabled = true;
+				return true;
+			}
+
+		incidentDisabled = false;
+		return false;
+	}
+
 	public Alert_HaveOverchargers()
 	{
 		defaultLabel = "stkHaveOverchargedRechargers".Translate();
@@ -60,6 +77,10 @@ public class Alert_HaveOverchargers : Alert
 	public override AlertReport GetReport()
 	{
 		targets.Clear();
+
+		if (IncidentDisabledByScenario())
+			return AlertReport.Inactive;
+
 		foreach (Map map in Find.Maps)
 			foreach (var c in OvercharginIncidentUtility.GetShortCircuitableChargers(map, false))
 				targets.Add(c);

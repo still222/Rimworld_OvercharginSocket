@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <LanguageData>
 
-	<stkHaveOverchargedRechargers>kaboom</stkHaveOverchargedRechargers>
-	<stkHaveOverchargedRechargersDesc>kaboom desc</stkHaveOverchargedRechargersDesc>
+	<stkHaveOverchargedRechargers>Overcharging</stkHaveOverchargedRechargers>
+	<stkHaveOverchargedRechargersDesc>Some of your rechargers are dangerously overcharged and may short-circuit.</stkHaveOverchargedRechargersDesc>
 
 	<stkSetPowerLevel>Overclock level</stkSetPowerLevel>
 
