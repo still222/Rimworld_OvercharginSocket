@@ -14,15 +14,15 @@ public class Gizmo_PowerLevel(CompPowerLevel comp) : Gizmo_Slider
 	private static readonly Texture2D PreciseLevel = ContentFinder<Texture2D>.Get("UI/Commands/StkSetTargetOverclock");
 	private int MaxPowerLevel => comp.MaxPowerLevel;
 	private float FloatStepLevel => 1f / MaxPowerLevel;
-	private float LightMechPowerUsage => comp.PowerLevel * comp.Props.lightMechCost * comp.PowerScaling;
-	private float HeavyMechPowerUsage => comp.PowerLevel * comp.Props.heavyMechCost * comp.PowerScaling;
+	private float LightMechPowerUsage => comp.powerLevel * comp.Props.lightMechCost * comp.PowerScaling;
+	private float HeavyMechPowerUsage => comp.powerLevel * comp.Props.heavyMechCost * comp.PowerScaling;
 
-	protected override float ValuePercent => (float)comp.PowerLevel / MaxPowerLevel;
+	protected override float ValuePercent => (float)comp.powerLevel / MaxPowerLevel;
 	protected override int Increments { get => MaxPowerLevel; }
 	protected override string Title => comp.Overcharged ? "stkChargingOverchargeLevel".TranslateSimple() : "stkChargingOverclockLevel".TranslateSimple();
 	protected override bool IsDraggable => comp.Overclockable;
 	protected override FloatRange DragRange { get => new(FloatStepLevel, 1f); }
-	protected override string BarLabel => $"{comp.PowerLevel} / {MaxPowerLevel} ({(comp.ExpectsHeavyMech ? HeavyMechPowerUsage : LightMechPowerUsage):F0} W)";
+	protected override string BarLabel => $"{comp.powerLevel} / {MaxPowerLevel} ({(comp.expectsHeavyMech ? HeavyMechPowerUsage : LightMechPowerUsage):F0} W)";
 	protected override Color BarColor 
 	{
 		get => comp.Overcharged 
@@ -43,7 +43,7 @@ public class Gizmo_PowerLevel(CompPowerLevel comp) : Gizmo_Slider
 	}
 	protected override float Target
 	{
-		get => (float)comp.PowerLevel / MaxPowerLevel;
+		get => (float)comp.powerLevel / MaxPowerLevel;
 		set => comp.SetPowerLevel(value * MaxPowerLevel);
 	}
 
@@ -107,7 +107,7 @@ public class Command_SetPowerLevel : Command
 
 		int max = comps.Min(c => c.MaxPowerLevel);
 
-		int start = comps[0].PowerLevel;
+		int start = comps[0].powerLevel;
 
 		static string PowerLevelTextGetter(int x)
 		{

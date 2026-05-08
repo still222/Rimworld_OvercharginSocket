@@ -18,10 +18,10 @@ public static class OvercharginIncidentUtility
 			if (charger.Power == null || powerLevelComp == null || !powerLevelComp.Overchargable)
 				continue;
 
-			if (!charger.Power.PowerOn || !powerLevelComp.Overcharged || charger.currentlyChargingMech == null)
+			if (!charger.Power.PowerOn || charger.currentlyChargingMech == null)
 				continue;
 
-			if (powerLevelComp.PowerLevel > powerLevelComp.Props.powerLevels)
+			if (powerLevelComp.critOvercharge)
 				yield return charger;
 
 		}

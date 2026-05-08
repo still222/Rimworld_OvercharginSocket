@@ -46,7 +46,7 @@ public static class MechTechUtility
 		if (comp == null)
 			return 1;
 
-		return comp.PowerLevel;
+		return comp.powerLevel;
 	}
 
 	public static void ProduceWaste(this Building_MechCharger c, int chargeMod)
