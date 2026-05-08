@@ -31,7 +31,7 @@ public class CompPowerLevel : ThingComp
 	public bool expectsHeavyMech = false;	// Gizmo shows power consumption depending on this bool. For chargers that charge non-Light or was charging them last time
 	private bool OverchargeOnInt = false;	// For handling flick-like logic for Overcharging
 	public bool wantsOvercharge = false;	// Controlled by gizmos, similar to flicking
-	public bool critOvercharge = false;		// Controls incidents
+	public bool critOverchargeSet = false;	// Controls incidents and send info for UI
 	private Mote moteOvercharging;			// For the red glow of overcharging mechs
 	public int MaxOvercharge => Props.powerLevels * TechLevel;	// This is sent to the gizmo tooltip
 	public int MaxPowerLevel => Overcharged ? MaxOvercharge : Props.powerLevels;
@@ -67,7 +67,7 @@ public class CompPowerLevel : ThingComp
 		base.PostExposeData();
 
 		Scribe_Values.Look(ref powerLevel, "PowerLevel", 1);
-		Scribe_Values.Look(ref critOvercharge, "critOvercharge", false);
+		Scribe_Values.Look(ref critOverchargeSet, "critOvercharge", false);
 		Scribe_Values.Look(ref OverchargeOnInt, "OverchargeOnInt", false);
 		Scribe_Values.Look(ref wantsOvercharge, "wantsOvercharge", false);
 		Scribe_Values.Look(ref expectsHeavyMech, "ExpectsHeavyMech", false);
@@ -79,7 +79,7 @@ public class CompPowerLevel : ThingComp
 
 			if (!Overchargable)
 			{
-				critOvercharge = false;
+				critOverchargeSet = false;
 				OverchargeOnInt = false;
 				wantsOvercharge = false;
 			}
@@ -113,6 +113,8 @@ public class CompPowerLevel : ThingComp
 		// Power update
 		if (parent.IsHashIntervalTick(250))
 		{
+			critOverchargeSet = Overcharged && powerLevel > Props.powerLevels;
+
 			if (mech == null || !powerOn)
 				Charger.Power.PowerOutput = 0f;
 
@@ -120,12 +122,8 @@ public class CompPowerLevel : ThingComp
 			{
 				if (Overclockable)
 				{
-					if (powerLevel > MaxPowerLevel)
-						powerLevel = MaxPowerLevel;
-
-					realPowerLevel = powerLevel;
-					mechEnergyBonus = defaultChargePerTick * (powerLevel - 1);
-					critOvercharge = Overcharged && realPowerLevel > Props.powerLevels;
+					realPowerLevel = powerLevel;	// Used for actual calculations
+					mechEnergyBonus = defaultChargePerTick * (realPowerLevel - 1);
 				}
 
 				if (IsLightCompatible && IsHeavyCompatible)
@@ -146,9 +144,9 @@ public class CompPowerLevel : ThingComp
 			return;
 
 		mech.needs.energy.CurLevel += mechEnergyBonus;
-		MechTechUtility.ProduceWaste(Charger, powerLevel - 1);
+		MechTechUtility.ProduceWaste(Charger, realPowerLevel - 1);
 
-		if (!critOvercharge) return;
+		if (!critOverchargeSet) return;
 		
 		if (moteOvercharging == null || moteOvercharging.Destroyed)
 			moteOvercharging = MoteMaker.MakeAttachedOverlay(mech, StkDefOf.StkMote_Overcharging, Vector3.zero);
@@ -221,6 +219,15 @@ public class CompPowerLevel : ThingComp
 	{
 		Overcharged = !Overcharged;
 		SoundDefOf.FlickSwitch.PlayOneShot(new TargetInfo(parent.Position, parent.Map));
+
+		if (!Overcharged)	// When overcharge is disabled remove dangerous effects
+		{
+			if (powerLevel > MaxPowerLevel)
+				powerLevel = MaxPowerLevel;
+
+			critOverchargeSet = false;
+		}
+
 	}
 
 	public bool WantsFlick()

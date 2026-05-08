@@ -1,13 +1,15 @@
 using System.Collections.Generic;
+using System.Linq;
 using HarmonyLib;
 using RimWorld;
+using RimWorld.Planet;
 using Verse;
 
 namespace StkOvercharginSocket;
 
 public static class OvercharginIncidentUtility
 {
-	public static IEnumerable<Building> GetShortCircuitableChargers(Map map)
+	public static IEnumerable<Building> GetShortCircuitableChargers(Map map, bool onlyWithMech = true)
 	// Original: RimWorld.ShortCircuitUtility.GetShortCircuitablePowerConduits
 	// Hopefuly we can reuse some vanilla methods for chargers. For now this list is completely included into the short circut event
 	{
@@ -15,13 +17,13 @@ public static class OvercharginIncidentUtility
 		{
 			CompPowerLevel powerLevelComp = charger.GetComp<CompPowerLevel>();
 
-			if (charger.Power == null || powerLevelComp == null || !powerLevelComp.Overchargable)
+			if (charger.Power == null || powerLevelComp == null || !powerLevelComp.Overchargable || !charger.Power.PowerOn)
 				continue;
 
-			if (!charger.Power.PowerOn || charger.currentlyChargingMech == null)
+			if (onlyWithMech && charger.currentlyChargingMech == null)
 				continue;
 
-			if (powerLevelComp.critOvercharge && charger.Faction == Faction.OfPlayer)
+			if (powerLevelComp.critOverchargeSet && charger.Faction == Faction.OfPlayer)
 				yield return charger;
 
 		}
@@ -44,3 +46,26 @@ public static class Patch_GetShortCircuitablePowerConduits
 	}
 
 }
+
+public class Alert_HaveOverchargers : Alert
+{
+	private readonly List<Thing> targets = [];
+	public Alert_HaveOverchargers()
+	{
+		defaultLabel = "stkHaveOverchargedRechargers".Translate();
+		defaultExplanation = "stkHaveOverchargedRechargersDesc".Translate();
+		defaultPriority = AlertPriority.Medium;
+	}
+
+	public override AlertReport GetReport()
+	{
+		targets.Clear();
+		foreach (Map map in Find.Maps)
+			foreach (var c in OvercharginIncidentUtility.GetShortCircuitableChargers(map, false))
+				targets.Add(c);
+
+		return AlertReport.CulpritsAre(targets);
+	}
+
+}
+
