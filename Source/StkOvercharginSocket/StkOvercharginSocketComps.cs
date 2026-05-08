@@ -25,16 +25,15 @@ public class CompPowerLevel : ThingComp
 	private bool IsHeavyCompatible => MechClassesList.Any(def => !LightMechClasses.Contains(def));
 	private static int TechLevel => MechTechUtility.GetLevel();	// From 1 to 4, depends on currently researched mech's technology
 	private const float defaultChargePerTick = 0.00083333335f;	// From original charger class. It uses it as a plain number, could change with game version
+	public int powerLevel = 1;				// Updates from the interface
 	private float mechEnergyBonus;			// To simlify tick calculations we cache the value every 250 ticks
 	private int realPowerLevel = 1;			// Updates on the tick which actually updates power
-	public int powerLevel = 1;				// Updates from the interface
 	public bool expectsHeavyMech = false;	// Gizmo shows power consumption depending on this bool. For chargers that charge non-Light or was charging them last time
 	private bool OverchargeOnInt = false;	// For handling flick-like logic for Overcharging
 	public bool wantsOvercharge = false;	// Controlled by gizmos, similar to flicking
 	public bool critOverchargeSet = false;	// Controls incidents and send info for UI
 	private Mote moteOvercharging;			// For the red glow of overcharging mechs
-	public int MaxOvercharge => Props.powerLevels * TechLevel;	// This is sent to the gizmo tooltip
-	public int MaxPowerLevel => Overcharged ? MaxOvercharge : Props.powerLevels;
+	public int MaxPowerLevel => Overcharged ? Props.powerLevels * TechLevel : Props.powerLevels;
 	public float PowerScaling => Props.scalingMod > 1f ? (float)Math.Pow(Props.scalingMod, powerLevel - 1) : 1f;
 	public float LightPowerUsage => realPowerLevel * Props.lightMechCost * PowerScaling;
 	public float HeavyPowerUsage => realPowerLevel * Props.heavyMechCost * PowerScaling;
@@ -192,7 +191,7 @@ public class CompPowerLevel : ThingComp
 
 	}
 
-	[SyncMethod(SyncContext.None)]
+	[SyncMethod]
 	public void SetPowerLevel(float inputLevel)
 	{
 		if (!Overclockable)
@@ -202,10 +201,11 @@ public class CompPowerLevel : ThingComp
 
 		if (powerLevel != level)
 			powerLevel = level;
+
 	}
 
 	// Flickable Overcharge
-	[SyncMethod(SyncContext.None)]
+	[SyncMethod]
 	public void ToggleOvercharge()
 	{
 		if (!Overchargable)

@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
+using Multiplayer.API;
 using RimWorld;
 using UnityEngine;
 using Verse;
@@ -13,15 +14,15 @@ public class Gizmo_PowerLevel(CompPowerLevel comp) : Gizmo_Slider
 	private static bool draggingBar;
 	private static readonly Texture2D PreciseLevel = ContentFinder<Texture2D>.Get("UI/Commands/StkSetTargetOverclock");
 	private int MaxPowerLevel => comp.MaxPowerLevel;
-	private float FloatStepLevel => 1f / MaxPowerLevel;
+	private float FloatPowerLevelPercent => (float)comp.powerLevel / MaxPowerLevel;
 	private float LightMechPowerUsage => comp.powerLevel * comp.Props.lightMechCost * comp.PowerScaling;
 	private float HeavyMechPowerUsage => comp.powerLevel * comp.Props.heavyMechCost * comp.PowerScaling;
 
-	protected override float ValuePercent => (float)comp.powerLevel / MaxPowerLevel;
+	protected override float ValuePercent => FloatPowerLevelPercent;
 	protected override int Increments { get => MaxPowerLevel; }
 	protected override string Title => comp.Overcharged ? "stkChargingOverchargeLevel".TranslateSimple() : "stkChargingOverclockLevel".TranslateSimple();
 	protected override bool IsDraggable => comp.Overclockable;
-	protected override FloatRange DragRange { get => new(FloatStepLevel, 1f); }
+	protected override FloatRange DragRange { get => new(1f / MaxPowerLevel, 1f); }
 	protected override string BarLabel => $"{comp.powerLevel} / {MaxPowerLevel} ({(comp.expectsHeavyMech ? HeavyMechPowerUsage : LightMechPowerUsage):F0} W)";
 	protected override Color BarColor 
 	{
@@ -41,10 +42,17 @@ public class Gizmo_PowerLevel(CompPowerLevel comp) : Gizmo_Slider
 		get => draggingBar;
 		set => draggingBar = value;
 	}
+
 	protected override float Target
 	{
-		get => (float)comp.powerLevel / MaxPowerLevel;
-		set => comp.SetPowerLevel(value * MaxPowerLevel);
+		get => FloatPowerLevelPercent;
+		set
+		{
+			if (MP.enabled && FloatPowerLevelPercent == value)
+				return;
+
+			comp.SetPowerLevel(value * MaxPowerLevel);
+		}
 	}
 
 	protected override void DrawHeader(Rect headerRect, ref bool mouseOverElement)

@@ -13,7 +13,9 @@ public static class Startup
 		harmony.PatchAll();
 
 		if (MP.enabled)
-			MP.RegisterSyncMethod(typeof(CompPowerLevel), nameof(CompPowerLevel.SetPowerLevel));
+		{
+			MP.RegisterAll();
+		}
 
 	}
 
