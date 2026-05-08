@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ModMetaData>
-	<name>StK Overcharged Socket</name>
+	<name>StK Overclocked Rechargers</name>
 	<author>stk</author>
 	<modVersion>v1.0</modVersion>
 	<supportedVersions>
 		<li>1.6</li>
 	</supportedVersions>
 	<packageId>stk.overcharged.socket</packageId>
-	<description>Sockets for mechs.</description>
+	<description>Allows mech rechargers to be overclocked for faster charging. Rechargers also stop consuming power when not actively charging.</description>
 	<loadAfter>
 		<li>Sinigang.WallMountCharger</li>
 	</loadAfter>
