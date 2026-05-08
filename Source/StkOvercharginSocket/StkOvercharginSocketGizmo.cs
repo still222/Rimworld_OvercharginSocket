@@ -25,13 +25,13 @@ public class Gizmo_PowerLevel(CompPowerLevel comp) : Gizmo_Slider
 	protected override string BarLabel => $"{comp.powerLevel} / {MaxPowerLevel} ({(comp.expectsHeavyMech ? HeavyMechPowerUsage : LightMechPowerUsage):F0} W)";
 	protected override Color BarColor 
 	{
-		get => comp.Overcharged 
+		get => comp.Overcharged && comp.powerLevel > comp.Props.powerLevels
 			? new Color(0.569f, 0.125f, 0f)
 			: base.BarColor;
 	}
 	protected override Color BarHighlightColor 
 	{
-		get => comp.Overcharged 
+		get => comp.Overcharged && comp.powerLevel > comp.Props.powerLevels
 			? new Color(0.749f, 0.165f, 0f)
 			: base.BarHighlightColor;
 	}
