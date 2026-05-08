@@ -1,8 +1,6 @@
 using System.Collections.Generic;
-using System.Linq;
 using HarmonyLib;
 using RimWorld;
-using RimWorld.Planet;
 using Verse;
 
 namespace StkOvercharginSocket;
@@ -30,6 +28,16 @@ public static class OvercharginIncidentUtility
 
 	}
 
+	// Incidents themselves check it already, but I need it for alerts
+	public static bool IncidentDisabledByScenario(IncidentDef def)
+	{
+		foreach (var part in Find.Scenario.parts)
+			if (part is ScenPart_DisableIncident disable && disable.Incident == def)
+				return true;
+
+		return false;
+	}
+
 }
 
 [HarmonyPatch(typeof(ShortCircuitUtility), nameof(ShortCircuitUtility.GetShortCircuitablePowerConduits))]
@@ -51,21 +59,7 @@ public class Alert_HaveOverchargers : Alert
 {
 	private readonly List<Thing> targets = [];
 	private bool? incidentDisabled;
-	private bool IncidentDisabledByScenario()
-	{
-		if (incidentDisabled.HasValue)
-			return incidentDisabled.Value;
-
-		foreach (var part in Find.Scenario.parts)
-			if (part is ScenPart_DisableIncident disable &&	disable.Incident == StkDefOf.ShortCircuit)
-			{
-				incidentDisabled = true;
-				return true;
-			}
-
-		incidentDisabled = false;
-		return false;
-	}
+	private bool IncidentDisabled => incidentDisabled ??= OvercharginIncidentUtility.IncidentDisabledByScenario(StkDefOf.ShortCircuit);
 
 	public Alert_HaveOverchargers()
 	{
@@ -78,7 +72,7 @@ public class Alert_HaveOverchargers : Alert
 	{
 		targets.Clear();
 
-		if (IncidentDisabledByScenario())
+		if (IncidentDisabled)
 			return AlertReport.Inactive;
 
 		foreach (Map map in Find.Maps)

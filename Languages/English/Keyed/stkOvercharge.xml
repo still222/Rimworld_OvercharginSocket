@@ -2,7 +2,7 @@
 <LanguageData>
 
 	<stkHaveOverchargedRechargers>Overcharging</stkHaveOverchargedRechargers>
-	<stkHaveOverchargedRechargersDesc>Some of your rechargers are dangerously overcharged and may short-circuit.</stkHaveOverchargedRechargersDesc>
+	<stkHaveOverchargedRechargersDesc>Some of your rechargers are dangerously overcharged and may short-circuit when charging a mech.</stkHaveOverchargedRechargersDesc>
 
 	<stkSetPowerLevel>Overclock level</stkSetPowerLevel>
 
