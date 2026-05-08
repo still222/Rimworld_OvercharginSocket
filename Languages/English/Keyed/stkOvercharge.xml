@@ -12,7 +12,6 @@
 	<stkSetPowerLevelDesc>Set overclock level to desired value.</stkSetPowerLevelDesc>
 
 	<stkCommandToggleOvercharge>Toggle overcharge</stkCommandToggleOvercharge>
-	<stkCommandToggleOverchargeDesc>This enables very fast charging, but can lead to STK:TODO. If enabled, mechs will charge up to {0} times faster.\n\nOvercharge is currently {ONOFF}.</stkCommandToggleOverchargeDesc>
 	<stkCommandToggleOverchargeDescMult>Designate this charger to {ONOFF} its overcharge mod. A colonist will come soon to flick the switch.</stkCommandToggleOverchargeDescMult>
 
 </LanguageData>
