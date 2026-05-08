@@ -27,22 +27,10 @@
 			<value>
 				<minifiedDef>MinifiedThing</minifiedDef>
 				<thingCategories>
-					<li>BuildingsFurniture</li>
+					<li>BuildingsMisc</li>
 				</thingCategories>
 			</value>
 		</nomatch>
-	</Operation>
-
-	<!--Example of a patch to change a specific charger-->
-	<Operation Class="PostInheritanceOperation.Patch">
-		<operation Class="PatchOperationReplace">
-			<xpath>/Defs/ThingDef[defName="stk_BasicSocketCharger"]/comps/li[@Class="StkOvercharginSocket.CompProperties_PowerLevel"]</xpath>
-			<value>
-				<li Class="StkOvercharginSocket.CompProperties_PowerLevel">
-					<overclockable>false</overclockable>
-				</li>
-			</value>
-		</operation>
 	</Operation>
 
 </Patch>

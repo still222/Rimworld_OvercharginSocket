@@ -8,6 +8,9 @@
 	</supportedVersions>
 	<packageId>stk.overcharged.socket</packageId>
 	<description>Sockets for mechs.</description>
+	<loadAfter>
+		<li>Sinigang.WallMountCharger</li>
+	</loadAfter>
 	<modDependencies>
 		<li>
 			<packageId>brrainz.harmony</packageId>
