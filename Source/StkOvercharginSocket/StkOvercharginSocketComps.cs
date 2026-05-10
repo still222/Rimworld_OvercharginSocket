@@ -200,12 +200,17 @@ public class CompPowerLevel : ThingComp
 
 		int level = Mathf.Clamp(Mathf.RoundToInt(inputLevel), 1, MaxPowerLevel);
 
-		MP.WatchBegin();
-		MP.Watch(this, nameof(powerLevel));
+		if (MP.enabled)
+		{
+			MP.WatchBegin();
+			MP.Watch(this, nameof(powerLevel));
+		}
+
 		if (powerLevel != level)
 			powerLevel = level;
 
-		MP.WatchEnd();
+		if (MP.enabled)
+			MP.WatchEnd();
 
 	}
 
