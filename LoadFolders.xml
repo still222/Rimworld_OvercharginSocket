@@ -3,5 +3,6 @@
 	<v1.6>
 		<li>/</li>
 		<li IfModActive="Sinigang.WallMountCharger">WallCharger</li>
+		<li IfModActive="Pal5k.PersonaMechs2">PersonaMechs2</li>
 	</v1.6>
 </loadFolders>

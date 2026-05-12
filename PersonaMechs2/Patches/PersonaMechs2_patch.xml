@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Patch>
+
+	<Operation Class="PostInheritanceOperation.Patch">
+		<operation Class="PatchOperationRemove">
+			<xpath>/Defs/ThingDef[thingClass="Persona_Pawns.PMP_DirectRecharger"]/comps/li[@Class="StkOvercharginSocket.CompProperties_PowerLevel"]</xpath>
+		</operation>
+	</Operation>
+
+</Patch>
