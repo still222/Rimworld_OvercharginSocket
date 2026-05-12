@@ -2,8 +2,11 @@
 <Patch>
 
 	<Operation Class="PostInheritanceOperation.Patch">
-		<operation Class="PatchOperationRemove">
+		<operation Class="PatchOperationConditional">
 			<xpath>/Defs/ThingDef[thingClass="Persona_Pawns.PMP_DirectRecharger"]/comps/li[@Class="StkOvercharginSocket.CompProperties_PowerLevel"]</xpath>
+			<match Class="PatchOperationRemove">
+				<xpath>/Defs/ThingDef[thingClass="Persona_Pawns.PMP_DirectRecharger"]/comps/li[@Class="StkOvercharginSocket.CompProperties_PowerLevel"]</xpath>
+			</match>
 		</operation>
 	</Operation>
 
