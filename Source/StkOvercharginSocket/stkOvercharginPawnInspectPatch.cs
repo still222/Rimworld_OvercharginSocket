@@ -19,12 +19,6 @@ public static class Patch_Pawn_GetInspectString
 			nameof(MechTechUtility.GetChargingPercentPerHour)
 		);
 
-		var toStringPercent = AccessTools.Method(
-			typeof(GenText),
-			nameof(GenText.ToStringPercent),
-			[typeof(float)]
-		);
-
 		bool replaced = false;
 		bool replacedString = false;
 
