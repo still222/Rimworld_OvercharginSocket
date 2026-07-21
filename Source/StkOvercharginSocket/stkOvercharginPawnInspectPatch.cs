@@ -9,7 +9,7 @@ namespace StkOvercharginSocket;
 
 // Default inspect string of a chraging mech just displays 50f/100f
 [HarmonyPatch(typeof(Pawn), nameof(Pawn.GetInspectString))]
-public static class Patch_Pawn_GetInspectString
+public static class Pawn_GetInspectString
 {
 	static readonly MethodInfo getCharging =
 		AccessTools.Method(
@@ -49,6 +49,15 @@ public static class Patch_Pawn_GetInspectString
 			if (code[i].opcode == OpCodes.Ldstr &&
 				(string)code[i].operand == "PerDay")
 			{
+				if (i + 3 >= code.Count ||
+					code[i + 1].opcode != OpCodes.Ldc_R4 ||
+					code[i + 2].opcode != OpCodes.Ldloc_S ||
+					code[i + 3].opcode != OpCodes.Div)
+				{
+					Log.Error("Something is wrong with StkOvercharginSocket.Pawn_GetInspectString Transplier, most likely from the game version change. Aborting Patch.");
+					break;
+				}
+
 				code[i].operand = "PerHour";									//398: ldstr "PerDay"
 				code[i + 1] = new CodeInstruction(OpCodes.Ldarg_0);				//399: ldc.r4 50
 				code[i + 2] = new CodeInstruction(OpCodes.Call, getCharging);	//400: ldloc.s 13 (System.Single)
