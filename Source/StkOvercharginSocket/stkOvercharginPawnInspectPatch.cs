@@ -65,6 +65,12 @@ public static class Pawn_GetInspectString
 				break;
 			}
 
+			if (i + 4 >= code.Count)
+			{
+				Log.Error("StkOvercharginSocket.Pawn_GetInspectString Transplier failed to find the target line, most likely from the game version change. Aborting Patch.");
+				break;
+			}
+
 		}
 
 		return code;
