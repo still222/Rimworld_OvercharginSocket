@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using System.Linq;
 using System.Reflection;
 using System.Reflection.Emit;
 using HarmonyLib;
@@ -28,9 +27,8 @@ public static class Patch_Pawn_GetInspectString
 	{
 		var code = new List<CodeInstruction>(instructions);
 
-		Log.Message(string.Join("\n", code.Select((x, i) => $"{i}: {x}")));
+		//Log.Message(string.Join("\n", code.Select((x, i) => $"{i}: {x}")));
 
-		// Original just displays 50f/maxLevel (in Vanilla always 100f)
 		//if (this.IsCharging())
 		//{
 		//	  taggedString += " (+" + "PerDay".Translate((50f / maxLevel).ToStringPercent()) + ")";
