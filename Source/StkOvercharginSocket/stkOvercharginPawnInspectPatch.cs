@@ -1,61 +1,66 @@
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Reflection.Emit;
 using HarmonyLib;
+using RimWorld;
 using Verse;
 
 namespace StkOvercharginSocket;
 
+// Default inspect string of a chraging mech just displays 50f/100f
 [HarmonyPatch(typeof(Pawn), nameof(Pawn.GetInspectString))]
 public static class Patch_Pawn_GetInspectString
-// Default inspect string of a chraging mech just displays 50f/100f
 {
-	static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions)
-	{
-		var list = instructions.ToList();
-
-		var getCharging = AccessTools.Method(
+	static readonly MethodInfo getCharging =
+		AccessTools.Method(
 			typeof(MechTechUtility),
 			nameof(MechTechUtility.GetChargingPercentPerHour)
 		);
+	static readonly MethodInfo isChargingMethod =
+		AccessTools.Method(
+			typeof(RestUtility),
+			nameof(RestUtility.IsCharging)
+		);
 
-		bool replaced = false;
-		bool replacedString = false;
+	[HarmonyTranspiler]
+	static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions)
+	{
+		var code = new List<CodeInstruction>(instructions);
 
-		for (int i = 0; i < list.Count; i++)
+		Log.Message(string.Join("\n", code.Select((x, i) => $"{i}: {x}")));
+
+		// Original just displays 50f/maxLevel (in Vanilla always 100f)
+		//if (this.IsCharging())
+		//{
+		//	  taggedString += " (+" + "PerDay".Translate((50f / maxLevel).ToStringPercent()) + ")";
+		//}
+
+		bool chargingInstr = false;
+		for (int i = 0; i < code.Count; i++)
 		{
-			// Match: ldc.r4 50
-			// 50f is appeares only once
-			if (!replaced &&
-				i + 2 < list.Count &&
-				list[i].opcode == OpCodes.Ldc_R4 &&
-				(float)list[i].operand == 50f &&
-				list[i + 2].opcode == OpCodes.Div)
+			if (!chargingInstr)
 			{
-				// Skip: 50f, maxLevel, div
-				i += 2;
+				if (code[i].opcode == OpCodes.Call &&
+					(MethodInfo)code[i].operand == isChargingMethod)
+						chargingInstr = true;
 
-				// Inject: pawn.GetChargingPercentPerHour()
-				yield return new CodeInstruction(OpCodes.Ldarg_0);
-				yield return new CodeInstruction(OpCodes.Call, getCharging);
-
-				replaced = true;
 				continue;
 			}
 
-			if (!replacedString &&
-				list[i].opcode == OpCodes.Ldstr &&
-				(string)list[i].operand == "PerDay")
+			if (code[i].opcode == OpCodes.Ldstr &&
+				(string)code[i].operand == "PerDay")
 			{
-				yield return new CodeInstruction(OpCodes.Ldstr, "PerHour");
-				replacedString = true;
-				continue;
+				code[i].operand = "PerHour";									//398: ldstr "PerDay"
+				code[i + 1] = new CodeInstruction(OpCodes.Ldarg_0);				//399: ldc.r4 50
+				code[i + 2] = new CodeInstruction(OpCodes.Call, getCharging);	//400: ldloc.s 13 (System.Single)
+				code[i + 3] = new CodeInstruction(OpCodes.Nop);					//401: div NULL
+				break;
 			}
-
-			yield return list[i];
 
 		}
 
+		return code;
 	}
 
 }

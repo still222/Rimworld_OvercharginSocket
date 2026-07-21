@@ -1,36 +1,36 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Patch>
-	<Operation Class="PatchOperationAdd">
-		<xpath>/Defs/ThingDef[@Name="BaseMechCharger"]/comps</xpath>
-		<value>
-			<!--All fields are optional-->
-			<li Class="StkOvercharginSocket.CompProperties_PowerLevel">
-				<powerLevels>5</powerLevels>	<!--Default: 5. Do not use 0. Does nothing when "overclockable" is disabled-->
-				<overclockable>true</overclockable>	<!--Simple faster charging *powerLevels. Default: true-->
-				<overchargable>true</overchargable>	<!--Explosive charging. Default: false-->
-				<scalingMod>1.02157</scalingMod>	<!--If set to 1 does nothing. Default: 1.02157 will apply ~x1.5 debuff at level 20-->
-				<!--(!)Power from CompPowerTrader does nothing(!)-->
-				<lightMechCost>200</lightMechCost>	<!--From basic charger consumption. Default: 200-->
-				<heavyMechCost>400</heavyMechCost>	<!--From heavy charger consumption. Default: 400-->
-				<countsAsLightWeightClasses>
-					<li>Light</li>				<!--Light is added by default. In case you want to have ultra-light mechs-->
-				</countsAsLightWeightClasses>
-			</li>
-		</value>
-	</Operation>
+  <Operation Class="PatchOperationAdd">
+    <xpath>/Defs/ThingDef[@Name="BaseMechCharger"]/comps</xpath>
+    <value>
+      <!--All fields are optional and can be removed if Default is acceptable-->
+      <li Class="StkOvercharginSocket.CompProperties_PowerLevel">
+        <powerLevels>5</powerLevels>        <!--Default: 5. Do not use 0. Does nothing when "overclockable" is disabled-->
+        <overclockable>true</overclockable>	<!--Simple faster charging *powerLevels. Default: true-->
+        <overchargable>true</overchargable>	<!--Explosive charging. Default: false-->
+        <maxScaling>1.5</maxScaling>        <!--If set to 1 does nothing. Default: will apply ~x1.5 energy consumption at max level-->
+        <!--(!)Power from CompPowerTrader does nothing(!)-->
+        <lightMechCost>200</lightMechCost>	<!--From basic charger consumption. Default: 200-->
+        <heavyMechCost>400</heavyMechCost>	<!--From heavy charger consumption. Default: 400-->
+        <countsAsLightWeightClasses>
+          <li>Light</li>                    <!--Light is added by default. In case you want to have ultra-light mechs-->
+        </countsAsLightWeightClasses>
+      </li>
+    </value>
+  </Operation>
 
-	<!--Makes basic recharger minifiable-->
-	<Operation Class="PatchOperationConditional">
-		<xpath>/Defs/ThingDef[defName="BasicRecharger"]/minifiedDef</xpath>
-		<nomatch Class="PatchOperationAdd">
-			<xpath>/Defs/ThingDef[defName="BasicRecharger"]</xpath>
-			<value>
-				<minifiedDef>MinifiedThing</minifiedDef>
-				<thingCategories>
-					<li>BuildingsMisc</li>
-				</thingCategories>
-			</value>
-		</nomatch>
-	</Operation>
+  <!--Makes basic recharger minifiable-->
+  <Operation Class="PatchOperationConditional">
+    <xpath>/Defs/ThingDef[defName="BasicRecharger"]/minifiedDef</xpath>
+    <nomatch Class="PatchOperationAdd">
+      <xpath>/Defs/ThingDef[defName="BasicRecharger"]</xpath>
+      <value>
+        <minifiedDef>MinifiedThing</minifiedDef>
+        <thingCategories>
+          <li>BuildingsMisc</li>
+        </thingCategories>
+      </value>
+    </nomatch>
+  </Operation>
 
 </Patch>

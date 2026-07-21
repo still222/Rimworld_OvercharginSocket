@@ -1,18 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Patch>
 
-	<!--Example of a patch to change a specific charger-->
-	<Operation Class="PostInheritanceOperation.Patch">
-		<operation Class="PatchOperationReplace">
-			<xpath>/Defs/ThingDef[defName="Sinigang_LightMechCharger"]/comps/li[@Class="StkOvercharginSocket.CompProperties_PowerLevel"]</xpath>
-			<value>
-				<li Class="StkOvercharginSocket.CompProperties_PowerLevel">
-					<!--Sinigang defines power as 600, and it's universal-->
-					<lightMechCost>300</lightMechCost>
-					<heavyMechCost>600</heavyMechCost>
-				</li>
-			</value>
-		</operation>
-	</Operation>
+  <!--Example of a patch to change a specific charger-->
+  <Operation Class="PostInheritanceOperation.Patch">
+    <operation Class="PatchOperationReplace">
+      <xpath>/Defs/ThingDef[defName="Sinigang_LightMechCharger"]/comps/li[@Class="StkOvercharginSocket.CompProperties_PowerLevel"]</xpath>
+      <value>
+        <li Class="StkOvercharginSocket.CompProperties_PowerLevel">
+          <!--Sinigang defines power as 600, and it's universal-->
+          <lightMechCost>300</lightMechCost>
+          <heavyMechCost>600</heavyMechCost>
+        </li>
+      </value>
+    </operation>
+  </Operation>
 
 </Patch>

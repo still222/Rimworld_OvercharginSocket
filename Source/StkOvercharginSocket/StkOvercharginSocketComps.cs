@@ -36,7 +36,7 @@ public class CompPowerLevel : ThingComp
 	public bool critOverchargeSet = false;	// Controls incidents and send info for UI
 	private Mote moteOvercharging;			// For the red glow of overcharging mechs
 	public int MaxPowerLevel => Overcharged ? Props.powerLevels * TechLevel : Props.powerLevels;
-	public float PowerScaling => Props.scalingMod > 1f ? (float)Math.Pow(Props.scalingMod, powerLevel - 1) : 1f;
+	public float PowerScaling => Props.maxScaling <= 1f ? 1f : (float)Math.Pow(Props.maxScaling, (powerLevel - 1) / (MaxPowerLevel - 1f));
 	public float LightPowerUsage => realPowerLevel * Props.lightMechCost * PowerScaling;
 	public float HeavyPowerUsage => realPowerLevel * Props.heavyMechCost * PowerScaling;
 	public bool Overchargable => !failState && Props.overchargable && TechLevel > 1;
@@ -273,7 +273,7 @@ public class CompProperties_PowerLevel : CompProperties
 	public int powerLevels = 5;
 	public bool overclockable = true;
 	public bool overchargable = false;
-	public float scalingMod = 1.02157f;	// To better tune the power scaling through XML. 1.02157 should add additional x1.5 scaling on level 20.
+	public float maxScaling = 1.5f;
 
 	// Default power cost for light and heavy chargers
 	public float lightMechCost = 200f;

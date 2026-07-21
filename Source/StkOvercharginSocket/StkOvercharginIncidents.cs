@@ -9,7 +9,6 @@ public static class OvercharginIncidentUtility
 {
 	public static IEnumerable<Building> GetShortCircuitableChargers(Map map, bool onlyWithMech = true)
 	// Original: RimWorld.ShortCircuitUtility.GetShortCircuitablePowerConduits
-	// Hopefuly we can reuse some vanilla methods for chargers. For now this list is completely included into the short circut event
 	{
 		foreach (Building_MechCharger charger in map.listerBuildings.AllBuildingsColonistOfClass<Building_MechCharger>())
 		{
@@ -43,6 +42,7 @@ public static class OvercharginIncidentUtility
 [HarmonyPatch(typeof(ShortCircuitUtility), nameof(ShortCircuitUtility.GetShortCircuitablePowerConduits))]
 public static class Patch_GetShortCircuitablePowerConduits
 {
+	[HarmonyPostfix]
 	public static IEnumerable<Building> Postfix(IEnumerable<Building> values, Map map)
 	{
 		foreach (Building building in values)
