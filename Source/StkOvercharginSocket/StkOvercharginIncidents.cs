@@ -20,7 +20,7 @@ public static class OvercharginIncidentUtility
 			if (onlyWithMech && charger.currentlyChargingMech == null)
 				continue;
 
-			if (powerLevelComp.critOverchargeSet && charger.Faction == Faction.OfPlayer)
+			if (powerLevelComp.Overcharged && powerLevelComp.powerLevel > 1 && charger.Faction == Faction.OfPlayer)
 				yield return charger;
 
 		}

@@ -16,10 +16,15 @@ public static class Pawn_GetInspectString
 			typeof(MechTechUtility),
 			nameof(MechTechUtility.GetChargingPercentPerHour)
 		);
-	static readonly MethodInfo isChargingMethod =
+	static readonly MethodInfo markerMethod =
 		AccessTools.Method(
 			typeof(RestUtility),
 			nameof(RestUtility.IsCharging)
+		);
+	static readonly MethodInfo missMethod =
+		AccessTools.Method(
+			typeof(RestUtility),
+			nameof(RestUtility.IsSelfShutdown)
 		);
 
 	[HarmonyTranspiler]
@@ -30,22 +35,23 @@ public static class Pawn_GetInspectString
 		//Log.Message(string.Join("\n", code.Select((x, i) => $"{i}: {x}")));
 
 		//if (this.IsCharging())
-		//{
-		//	  taggedString += " (+" + "PerDay".Translate((50f / maxLevel).ToStringPercent()) + ")";
-		//}
+		//	  taggedString += " (+" + "PerDay".Translate((50f / maxLevel).ToStringPercent()) + ")";		<===
+		//else if (this.IsSelfShutdown())
 
-		bool chargingInstr = false;
+		bool marker = false;
 		for (int i = 0; i < code.Count; i++)
 		{
-			if (!chargingInstr)
+			// Target block
+			if (!marker && i + 4 < code.Count)
 			{
 				if (code[i].opcode == OpCodes.Call &&
-					(MethodInfo)code[i].operand == isChargingMethod)
-						chargingInstr = true;
+					(MethodInfo)code[i].operand == markerMethod)
+						marker = true;
 
 				continue;
 			}
 
+			// Transplier's body
 			if (code[i].opcode == OpCodes.Ldstr &&
 				(string)code[i].operand == "PerDay")
 			{
@@ -54,7 +60,7 @@ public static class Pawn_GetInspectString
 					code[i + 2].opcode != OpCodes.Ldloc_S ||
 					code[i + 3].opcode != OpCodes.Div)
 				{
-					Log.Error("Something is wrong with StkOvercharginSocket.Pawn_GetInspectString Transplier, most likely from the game version change. Aborting Patch.");
+					Log.Warning("[StkOverchargin] Pawn_GetInspectString Transplier failed to find a correct sequence, most likely from the game version change. Aborting Patch.");
 					break;
 				}
 
@@ -65,9 +71,12 @@ public static class Pawn_GetInspectString
 				break;
 			}
 
-			if (i + 4 >= code.Count)
+			// Miss Block
+			if (i + 4 >= code.Count ||
+				(code[i].opcode == OpCodes.Call &&
+				(MethodInfo)code[i].operand == missMethod))
 			{
-				Log.Error("StkOvercharginSocket.Pawn_GetInspectString Transplier failed to find the target line, most likely from the game version change. Aborting Patch.");
+				Log.Warning("[StkOverchargin] Pawn_GetInspectString Transplier failed to find a correct sequence, most likely from the game version change. Aborting Patch.");
 				break;
 			}
 

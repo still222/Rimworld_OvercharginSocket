@@ -13,25 +13,23 @@ public class Gizmo_PowerLevel(CompPowerLevel comp) : Gizmo_Slider
 	private static bool draggingBar;
 	private static readonly Texture2D PreciseLevel = ContentFinder<Texture2D>.Get("UI/Commands/StkSetTargetOverclock");
 	private int MaxPowerLevel => comp.MaxPowerLevel;
-	private float FloatPowerLevelPercent => (float)comp.powerLevel / MaxPowerLevel;
-	private float LightMechPowerUsage => comp.powerLevel * comp.Props.lightMechCost * comp.PowerScaling;
-	private float HeavyMechPowerUsage => comp.powerLevel * comp.Props.heavyMechCost * comp.PowerScaling;
-
-	protected override float ValuePercent => FloatPowerLevelPercent;
+	protected override float ValuePercent => (float)comp.powerLevel / MaxPowerLevel;
 	protected override int Increments { get => MaxPowerLevel; }
 	protected override string Title => comp.Overcharged ? "stkChargingOverchargeLevel".TranslateSimple() : "stkChargingOverclockLevel".TranslateSimple();
 	protected override bool IsDraggable => comp.Overclockable;
 	protected override FloatRange DragRange { get => new(1f / MaxPowerLevel, 1f); }
-	protected override string BarLabel => $"{comp.powerLevel} / {MaxPowerLevel} ({(comp.expectsHeavyMech ? HeavyMechPowerUsage : LightMechPowerUsage):F0} W)";
+	protected override string BarLabel =>
+		$"{comp.powerLevel} / {MaxPowerLevel} ({comp.PowerScaling * comp.powerLevel * (comp.expectsHeavyMech ? comp.Props.heavyMechCost : comp.Props.lightMechCost):F0} W)";
 	protected override Color BarColor 
 	{
-		get => comp.Overcharged && comp.powerLevel > comp.Props.powerLevels
+		get => comp.Overcharged
 			? new Color(0.569f, 0.125f, 0f)
 			: base.BarColor;
 	}
+
 	protected override Color BarHighlightColor 
 	{
-		get => comp.Overcharged && comp.powerLevel > comp.Props.powerLevels
+		get => comp.Overcharged
 			? new Color(0.749f, 0.165f, 0f)
 			: base.BarHighlightColor;
 	}
@@ -44,14 +42,15 @@ public class Gizmo_PowerLevel(CompPowerLevel comp) : Gizmo_Slider
 
 	protected override float Target
 	{
-		get => FloatPowerLevelPercent;
+		get => ValuePercent;
 		set
 		{
-			if (FloatPowerLevelPercent == value)
+			if (ValuePercent == value)
 				return;
 
 			comp.SetPowerLevel(value * MaxPowerLevel);
 		}
+
 	}
 
 	protected override void DrawHeader(Rect headerRect, ref bool mouseOverElement)
@@ -85,7 +84,7 @@ public class Gizmo_PowerLevel(CompPowerLevel comp) : Gizmo_Slider
 		base.DrawHeader(headerRect, ref mouseOverElement);
 	}
 
-	private string OverchargeTip()
+	private static string OverchargeTip()
 	{
 		return "stkSetPowerLevelDesc".TranslateSimple();
 	}
