@@ -117,7 +117,7 @@ public class CompPowerLevel : ThingComp
 		if (parent.IsHashIntervalTick(250))
 		{
 			if (mech == null || !powerOn)
-				Charger.Power.PowerOutput = 0f;
+				Charger.Power.PowerOutput = powerOn ? -15f : 0f;
 
 			else
 			{
