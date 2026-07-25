@@ -44,8 +44,7 @@ public static class Pawn_GetInspectString
 			// Target block
 			if (!marker && i + 4 < code.Count)
 			{
-				if (code[i].opcode == OpCodes.Call &&
-					(MethodInfo)code[i].operand == markerMethod)
+				if (code[i].Calls(markerMethod))
 						marker = true;
 
 				continue;
@@ -72,9 +71,7 @@ public static class Pawn_GetInspectString
 			}
 
 			// Miss Block
-			if (i + 4 >= code.Count ||
-				(code[i].opcode == OpCodes.Call &&
-				(MethodInfo)code[i].operand == missMethod))
+			if (i + 4 >= code.Count || code[i].Calls(missMethod))
 			{
 				Log.Warning("[StkOverchargin] Pawn_GetInspectString Transplier failed to find a correct sequence, most likely from the game version change. Aborting Patch.");
 				break;
