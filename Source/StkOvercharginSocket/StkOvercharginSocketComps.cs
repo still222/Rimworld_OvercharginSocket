@@ -37,7 +37,7 @@ public class CompPowerLevel : ThingComp
 	public bool Overclockable => !failState && Props.overclockable;
 	public bool Overchargable => !failState && Props.overchargable && TechLevel > 1;
 	public int MaxPowerLevel => Overcharged ? Props.powerLevels * TechLevel : Props.powerLevels;
-	public float PowerScaling => Props.maxScaling <= 1f ? 1f : (float)Math.Pow(Props.maxScaling, (powerLevel - 1) / (MaxPowerLevel - 1f));
+	public float PowerScaling => Props.maxScaling <= 1f ? 1f : Mathf.Pow(Props.maxScaling, (powerLevel - 1) / (MaxPowerLevel - 1f));
 
 	public override void PostSpawnSetup(bool respawningAfterLoad)
 	{
