@@ -2,9 +2,10 @@
 <ModMetaData>
 	<name>StK Overclocked Rechargers</name>
 	<author>stk</author>
-	<modVersion>v1.5.3</modVersion>
+	<modVersion>v1.5.5</modVersion>
 	<supportedVersions>
 		<li>1.6</li>
+		<li>1.7</li>
 	</supportedVersions>
 	<packageId>stk.overcharged.socket</packageId>
 	<description>Allows mech rechargers to be overclocked for faster charging. Rechargers also stop consuming power when not actively charging.</description>
