@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<Defs>
+
+	<WorkGiverDef>
+		<defName>StkOverchargeFlick</defName>
+		<label>flick overcharging</label>
+		<giverClass>StkOvercharginSocket.WorkGiver_OverchargeFlick</giverClass>
+		<workType>BasicWorker</workType>
+		<verb>flick switch on</verb>
+		<gerund>flicking switch on</gerund>
+		<canBeDoneWhileDrafted>true</canBeDoneWhileDrafted>
+		<priorityInType>555</priorityInType>
+	</WorkGiverDef>
+
+	<JobDef>
+		<defName>StkOverchargeFlick</defName>
+		<driverClass>StkOvercharginSocket.JobDriver_OverchargeFlick</driverClass>
+		<reportString>flicking overcharge switch.</reportString>
+		<allowOpportunisticPrefix>true</allowOpportunisticPrefix>
+	</JobDef>
+
+	<DesignationDef>
+		<defName>StkDesignationFlick</defName>
+		<texturePath>Designations/Flick</texturePath>
+		<targetType>Thing</targetType>
+		<designateCancelable>false</designateCancelable>
+	</DesignationDef>
+
+</Defs>

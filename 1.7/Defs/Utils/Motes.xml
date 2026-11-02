@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Defs>
+
+	<ThingDef ParentName="MoteBase">
+		<defName>StkMote_Overcharging</defName>
+		<thingClass>MoteAttached</thingClass>
+		<altitudeLayer>MoteOverhead</altitudeLayer>
+		<mote>
+			<fadeInTime>0.35</fadeInTime>
+			<fadeOutTime>0.25</fadeOutTime>
+			<solidTime>999999</solidTime>
+			<needsMaintenance>True</needsMaintenance>
+		</mote>
+		<graphicData>
+			<graphicClass>Graphic_PawnBodySilhouette</graphicClass>
+			<color>(0.96, 0.38, 0.2, 1.0)</color>
+			<shaderType>MoteMultiplyAddScroll</shaderType>
+			<texPath>Things/Mote/Transparent</texPath>
+			<shaderParameters>
+				<_MultiplyTexA>/Things/Mote/Cloudy_A</_MultiplyTexA>
+				<_MultiplyTexB>/Things/Mote/Cloudy_C</_MultiplyTexB>
+				<_DetailTex>/Things/Mote/Electicity</_DetailTex>
+				<_detailIntensity>1.3</_detailIntensity>
+				<_texAScale>0.3</_texAScale>
+				<_texBScale>0.35</_texBScale>
+				<_DetailScale>0.75</_DetailScale>
+				<_texAScrollSpeed>(0, 0.15, 0)</_texAScrollSpeed>
+				<_texBScrollSpeed>(0.1, -0.15, 0)</_texBScrollSpeed>
+				<_detailScrollSpeed>(0.2, 0.0, 0)</_detailScrollSpeed>
+				<_DetailOffset>(0.345, 0.0)</_DetailOffset>
+				<_DetailDistortion>0.1</_DetailDistortion>
+			</shaderParameters>
+		</graphicData>
+	</ThingDef>
+
+</Defs>
