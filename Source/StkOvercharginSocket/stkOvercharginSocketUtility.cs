@@ -8,13 +8,13 @@ namespace StkOvercharginSocket;
 public static class StkDefOf
 {
 	//public static ResearchProjectDef BasicMechtech;
-	public static ResearchProjectDef StandardMechtech;
-	public static ResearchProjectDef HighMechtech;
-	public static ResearchProjectDef UltraMechtech;
-	public static DesignationDef StkDesignationFlick;
-	public static IncidentDef ShortCircuit;
-	public static ThingDef StkMote_Overcharging;
-	public static JobDef StkOverchargeFlick;
+	public static readonly ResearchProjectDef StandardMechtech;
+	public static readonly ResearchProjectDef HighMechtech;
+	public static readonly ResearchProjectDef UltraMechtech;
+	public static readonly DesignationDef StkDesignationFlick;
+	public static readonly IncidentDef ShortCircuit;
+	public static readonly ThingDef StkMote_Overcharging;
+	public static readonly JobDef StkOverchargeFlick;
 }
 
 public static class MechTechUtility
